@@ -6,6 +6,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity
  * @ORM\Table(name="abi_code_rating")
+ * @ORM\Entity(repositoryClass="App\Repository\AbiCodeRatingRepository")
  */
 class AbiCodeRating {
     /**
