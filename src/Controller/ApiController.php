@@ -6,6 +6,7 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use App\Entity\AbiCodeRating;
+use App\Traits\PremiumTrait;
 use App\Form\PremiumType;
 use Doctrine\ORM\EntityManagerInterface;
 /**
@@ -14,6 +15,9 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 class ApiController extends FOSRestController
 {
+    //----- Premium rate calculator trait ------//
+    use PremiumTrait;
+
     /**
      * Lists all Premiums.
      * @Rest\Get("/Premiums")
@@ -43,9 +47,22 @@ class ApiController extends FOSRestController
 
             //--------- Trigger API call for Abi Code --------------//
             $AbiCode    = 22529902;
+            $basePremium = 500.00;
 
+            //----------- AbiCode Rate Premium ---------------//
             $abiCodeRatingRepository = $em->getRepository(AbiCodeRating::class);
-            $abiCodeRate = $abiCodeRatingRepository->findOneByAbiCode($AbiCode);
+            $abiCodeRatePremium = $this->calculateRatingFactor(
+                $abiCodeRatingRepository,
+                $AbiCode,
+                $basePremium
+            );
+
+
+            //--------- Building DTOs --------//
+            $dataDTO['abiCodeRatePremium'] = $abiCodeRatePremium;
+
+
+
 
 
 
@@ -60,7 +77,11 @@ class ApiController extends FOSRestController
             //$em->persist($movie);
             //$em->flush();
             return $this->handleView($this->view(
-                ['status' => 'ok'],
+                [
+                    'status' => 'ok',
+                    'data' => $dataDTO,
+                    'message' => 'Premium Successfully retrieved'
+                ],
                 Response::HTTP_CREATED));
         }
 

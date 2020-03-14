@@ -15,10 +15,6 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class AbiCodeRatingRepository extends ServiceEntityRepository
 {
-    /**
-     * AbiCodeRatingRepository constructor.
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, AbiCodeRating::class);
@@ -31,7 +27,7 @@ class AbiCodeRatingRepository extends ServiceEntityRepository
     public function findByAbiCode($value)
     {
         return $this->createQueryBuilder('a')
-            ->andWhere('a.abi_code  = :val')
+            ->andWhere('a.abiCode  = :val')
             ->setParameter('val', $value)
             ->orderBy('a.id', 'ASC')
             ->setMaxResults(10)
@@ -44,10 +40,10 @@ class AbiCodeRatingRepository extends ServiceEntityRepository
      * @param $value
      * @return AbiCodeRating|null
      */
-    public function findOneByAbiCode($value): ?AbiCodeRating
+    public function findOneByRatingFactor($value): ?AbiCodeRating
     {
         return $this->createQueryBuilder('a')
-            ->andWhere('a.abi_code  = :val')
+            ->andWhere('a.abiCode  = :val')
             ->setParameter('val', $value)
             ->getQuery()
             ->getOneOrNullResult()
