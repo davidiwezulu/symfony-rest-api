@@ -7,7 +7,9 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use App\Entity\PostcodeRating;
 use App\Entity\AbiCodeRating;
+use App\Entity\BasePremium;
 use App\Entity\AgeRating;
+use App\Entity\Quote;
 use App\Traits\PremiumTrait;
 use App\Form\PremiumType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,26 +19,13 @@ use \GuzzleHttp\Client;
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 /**
- * Movie controller.
+ * API controller.
  * @Route("/api", name="api_")
  */
 class ApiController extends FOSRestController
 {
     //----- Premium rate calculator trait ------//
     use PremiumTrait;
-
-    /**
-     * Lists all Premiums.
-     * @Rest\Get("/Premiums")
-     *
-     * @return Response
-     */
-    public function getMovieAction()
-    {
-        $repository = $this->getDoctrine()->getRepository(Movie::class);
-        $movies = $repository->findall();
-        return $this->handleView($this->view($movies));
-    }
 
     /**
      * Create Premium.
@@ -52,38 +41,25 @@ class ApiController extends FOSRestController
         $form->submit($data);
         if ($form->isSubmitted() && $form->isValid()) {
 
+            $quoteRepository        = $em->getRepository(Quote::class);
+            $quotes                 = $quoteRepository->findBy($data);
+
             //--------- Trigger API call for Abi Code --------------//
-            $basePremium        = 500.00;
+            $basePremium        = $this->getBasePremium($em);
 
             //~~~~~~~~~~~~~~~~ \App\Traits\PremiumTrait ~~~~~~~~~~~~//
             $data['abiCode']    = $this->abiCodeLookUp($data);
-            list (
-                $abiCodeRatePremium,
-                $postcodeRatePremium,
-                $ageRatePremium
-            )   = $this->fetchPremiumData($em, $data, $basePremium );
+            $premiumArray       = $this->fetchPremiumData($em, $data, $basePremium );
+            $quoteData          = $this->persistNewQuote($em, $data, $premiumArray);
             //~~~~~~~~~~~~~~~~ End of Trait call ~~~~~~~~~~~~~~~~~~~//
 
             //--------- Building DTOs --------//
-            $dataDTO['abiCodeRatePremium']  = $abiCodeRatePremium;
-            $dataDTO['postcodeRatePremium'] = $postcodeRatePremium;
-            $dataDTO['ageRatePremium']      = $ageRatePremium;
+            $dataDTO['quotePolicyNumber']   = $quoteData->getPolicyNumber();
+            $dataDTO['abiCode']             = $quoteData->getAbiCode();
+            $dataDTO['regNo']               = $quoteData->getRegNo();;
+            $dataDTO['postcode']            = $quoteData->getPostcode();
+            $dataDTO['averagePremium']      = number_format($quoteData->getPremium(), 2);
 
-
-
-
-
-
-
-
-            //
-
-
-
-
-            //$em = $this->getDoctrine()->getManager();
-            //$em->persist($movie);
-            //$em->flush();
             return $this->handleView($this->view(
                 [
                     'status' => 'ok',

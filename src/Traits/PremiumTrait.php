@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\PostcodeRating;
 use App\Entity\AgeRating;
+use App\Entity\Quote;
+use App\Entity\BasePremium;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -16,6 +18,39 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 trait PremiumTrait
 {
+    /**
+     * @param $em
+     * @return mixed
+     */
+    public function getBasePremium($em) {
+        $basePremiumRepository  = $em->getRepository(BasePremium::class);
+        $basePremiumObject      = $basePremiumRepository->findFirstPremium();
+        $basePremium            = $basePremiumObject->getBasePremium();
+
+        return $basePremium;
+    }
+
+    /**
+     * @param $em
+     * @param $data
+     * @param $premiumDataArray
+     * @return Quotes
+     */
+    public function persistNewQuote($em, $data, $premiumDataArray) {
+        $averagePremium = array_sum($premiumDataArray)/count($premiumDataArray);
+        $quote = new Quote();
+        $quote->setPolicyNumber('1111');
+        $quote->setAge($data['age']);
+        $quote->setPostcode($data['postcode']);
+        $quote->setRegNo($data['regNo']);
+        $quote->setAbiCode($data['abiCode']);
+        $quote->setPremium($averagePremium);
+        $em->persist($quote);
+        $em->flush();
+
+        return $quote;
+    }
+
 
     /**
      * @param $codeRepository

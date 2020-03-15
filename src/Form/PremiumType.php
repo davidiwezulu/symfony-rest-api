@@ -29,7 +29,10 @@ class PremiumType extends AbstractType
                 'attr' => [
                     'min'  => 1,
                     'max'  => 120,
-                ]
+                ],
+                'constraints' => [
+                    new NotBlank(),
+                ],
             ])
             ->add('postcode', TextType::class, [
                 'required' => true,
