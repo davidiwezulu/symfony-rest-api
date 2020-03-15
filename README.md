@@ -1,4 +1,4 @@
-# Symfony REST API Skeletion. 
+# Symfony Premium API. 
 <p>Built in Symfony MVC framework.</p>
 
 ## Installation and Setup
