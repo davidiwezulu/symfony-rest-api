@@ -6,7 +6,7 @@ Run the following commands below to setup the server
 - `composer install`
 - Create an empty database to be used in `.env`file
 - Setup the database connection in `.env` file and run `php bin/console doctrine:schema:create` to create entity table schemas
-- Run migration on the newly created database `php bin/console make:migration` 
+- Run a migration on the newly created database `php bin/console make:migration` 
 - Migrate entities to database tables `php bin/console doctrine:migrations:migrate` 
 - Populate database with dummy data `bin/console doctrine:fixtures:load` 
 - Start the server with `php bin/console server:run`
