@@ -12,7 +12,7 @@ Run the following commands below to setup the server
 - Start server with `php bin/console server:run`
 <br/>That's it!
 
-## Make a test API call with:
+### Make a test API call with:
 `curl --header "Content-Type: application/json" \
 --request POST \
 --data '{"age":"20","postcode":"PE3 8AF", "regNo":"PJ63 LXR"}' \
