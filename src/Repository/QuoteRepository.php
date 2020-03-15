@@ -35,5 +35,4 @@ class QuoteRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
-
 }
