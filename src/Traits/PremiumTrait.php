@@ -45,7 +45,7 @@ trait PremiumTrait
     {
         $averagePremium = array_sum($premiumDataArray)/count($premiumDataArray);
         $quote = new Quote();
-        $quote->setPolicyNumber('1111');
+        $quote->setPolicyNumber(mt_rand(100000,999999)); //Production should have a better logic
         $quote->setAge($data['age']);
         $quote->setPostcode($data['postcode']);
         $quote->setRegNo($data['regNo']);
