@@ -12,7 +12,10 @@ use App\Traits\PremiumTrait;
 use App\Form\PremiumType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\HttpClientInterface;
+use \GuzzleHttp\Client;
 use Symfony\Component\HttpClient\CurlHttpClient;
+use Symfony\Component\HttpClient\NativeHttpClient;
 /**
  * Movie controller.
  * @Route("/api", name="api_")
@@ -53,7 +56,7 @@ class ApiController extends FOSRestController
             $basePremium        = 500.00;
 
             //~~~~~~~~~~~~~~~~ \App\Traits\PremiumTrait ~~~~~~~~~~~~//
-            $data['abiCode']    = $this->abiCodeLookUp(new CurlHttpClient(), $data);
+            $data['abiCode']    = $this->abiCodeLookUp($data);
             list (
                 $abiCodeRatePremium,
                 $postcodeRatePremium,

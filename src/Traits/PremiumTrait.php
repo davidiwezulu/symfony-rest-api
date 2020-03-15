@@ -8,7 +8,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\PostcodeRating;
 use App\Entity\AgeRating;
-use Symfony\Component\HttpClient\NativeHttpClient;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 trait PremiumTrait
 {
@@ -75,33 +79,66 @@ trait PremiumTrait
 
     }
 
-
     /**
      * Fetch ABI data from Post body
-     * @param $client
      * @param $data
-     * @return mixed
+     * @return int
      */
-    public static function abiCodeLookUp( $client, $data) {
-        $abiCode = 22529902;
+    public  function abiCodeLookUp($data) {
+        //----- Fall back ABI code for API mock up ----------------//
+        $abiCode    = 22529902;
 
         //-- Proceed with the next request ------------------------//
         try {
-            $apiRequest = $client->request('POST', 'https://testing.test.com/oauth/token', [
-                'form_params' => [
-                    'age' => $data['age'],
-                    'postcode' => $data['postcode'],
-                    'regno' => $data['regno'],
-                ]
-            ]);
-
-            $apiResponse    = json_decode($apiRequest->getBody());
-            $abiCode        = $apiResponse->abiCode;
+            $rest_data  = $this->callVendorsAPI('POST', 'https://testing.test.com/oauth/token', $data);
+            $response   = json_decode($rest_data, true);
+            $codeData   = $response['response']['data'][0];
+            if ($codeData && ! is_null($codeData) ) $abiCode = $codeData;
         } catch (\Exception $exception) {}
-
 
         return $abiCode;
 
+    }
+
+    /**
+     * @param $method
+     * @param $url
+     * @param $data
+     * @return mixed
+     */
+    public function callVendorsAPI($method, $url, $data){
+        $curl           = curl_init();
+        //~~~~~~~~~ Should be stored in a config environment ~~~~~//
+        $vendorToken    = "080042cad6356ad5dc0a720c18b53b8e53d4c274";
+        $authorization  = "Authorization: Bearer $vendorToken";
+        switch ($method){
+            case "POST":
+                curl_setopt($curl, CURLOPT_POST, 1);
+                if ($data)
+                    curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+                break;
+            case "PUT":
+                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
+                if ($data)
+                    curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+                break;
+            default:
+                if ($data)
+                    $url = sprintf("%s?%s", $url, http_build_query($data));
+        }
+        // OPTIONS:
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
+            $authorization,
+            'Content-Type: application/json',
+        ]);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        // EXECUTE:
+        $result = curl_exec($curl);
+
+        curl_close($curl);
+        return $result;
     }
 
 }
