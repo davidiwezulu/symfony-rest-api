@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Validator\Constraints as Assert;
 
 
 /**
@@ -26,12 +27,12 @@ class PremiumType extends AbstractType
         $builder
             ->add('age', NumberType::class, [
                 'required' => true,
-                'attr' => [
-                    'min'  => 1,
-                    'max'  => 120,
-                ],
                 'constraints' => [
                     new NotBlank(),
+                    new Assert\Positive(),
+                    new Assert\LessThan([
+                        'value' => 120,
+                        ]),
                 ],
             ])
             ->add('postcode', TextType::class, [

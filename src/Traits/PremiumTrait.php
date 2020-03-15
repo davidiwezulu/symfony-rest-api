@@ -22,7 +22,7 @@ trait PremiumTrait
      * @param $em
      * @return mixed
      */
-    public function getBasePremium($em) {
+    public function getBasePremium(EntityManagerInterface $em) {
         $basePremiumRepository  = $em->getRepository(BasePremium::class);
         $basePremiumObject      = $basePremiumRepository->findFirstPremium();
         $basePremium            = $basePremiumObject->getBasePremium();
@@ -36,7 +36,7 @@ trait PremiumTrait
      * @param $premiumDataArray
      * @return Quotes
      */
-    public function persistNewQuote($em, $data, $premiumDataArray) {
+    public function persistNewQuote(EntityManagerInterface $em, $data, $premiumDataArray) {
         $averagePremium = array_sum($premiumDataArray)/count($premiumDataArray);
         $quote = new Quote();
         $quote->setPolicyNumber('1111');
@@ -58,7 +58,7 @@ trait PremiumTrait
      * @param float $basePremium
      * @return string
      */
-    public function calculateRatingFactor($codeRepository, $needle, $basePremium = 500.00)
+    public function calculateRatingFactor($codeRepository, string $needle, $basePremium = 500.00)
     {
         //---------- Use Entity's repository instance to fetch data -----------//
         $abiCodeRatePremium    = $basePremium;
@@ -119,7 +119,7 @@ trait PremiumTrait
      * @param $data
      * @return int
      */
-    public  function abiCodeLookUp($data) {
+    public  function abiCodeLookUp(array $data) {
         //----- Fall back ABI code for API mock up ----------------//
         $abiCode    = 22529902;
 
@@ -141,7 +141,7 @@ trait PremiumTrait
      * @param $data
      * @return mixed
      */
-    public function callVendorsAPI($method, $url, $data){
+    public function callVendorsAPI(string $method, string $url, array $data){
         $curl           = curl_init();
         //~~~~~~~~~ Should be stored in a config environment ~~~~~//
         $vendorToken    = "080042cad6356ad5dc0a720c18b53b8e53d4c274";
@@ -161,7 +161,7 @@ trait PremiumTrait
                 if ($data)
                     $url = sprintf("%s?%s", $url, http_build_query($data));
         }
-        // OPTIONS:
+        //---------- OPTIONS: ------------------//
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_HTTPHEADER, [
             $authorization,
@@ -169,7 +169,8 @@ trait PremiumTrait
         ]);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        // EXECUTE:
+
+        //----------- EXECUTE: ------------------//
         $result = curl_exec($curl);
 
         curl_close($curl);
