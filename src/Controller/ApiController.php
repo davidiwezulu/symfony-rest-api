@@ -42,21 +42,20 @@ class ApiController extends FOSRestController
         if ($form->isSubmitted() && $form->isValid()) {
 
             //------ Check to see if we already have a corresponding quote ----//
-            $quoteRepository        = $em->getRepository(Quote::class);
-            $quotes                 = $quoteRepository->findBy($data);
+            $quoteRepository    = $em->getRepository(Quote::class);
+            $quotes             = $quoteRepository->findBy($data);
 
             if ( ! empty($quotes) && count($quotes) > 0 ) {
                 //---------- Send retrieved quote to APIs DTO ----------//
                 $quoteData  = $quotes[0];
             } else {
-                //--------- Trigger API call for Abi Code --------------//
+                //~~~~~~~~~~~~~~~~ #\App\Traits\PremiumTrait ~~~~~~~~~~~~//
+                //--------- Trigger API call to fetch ABI Code --------------//
                 $basePremium        = $this->getBasePremium($em);
-
-                //~~~~~~~~~~~~~~~~ \App\Traits\PremiumTrait ~~~~~~~~~~~~//
                 $data['abiCode']    = $this->abiCodeLookUp($data);
                 $premiumArray       = $this->fetchPremiumData($em, $data, $basePremium );
                 $quoteData          = $this->persistNewQuote($em, $data, $premiumArray);
-                //~~~~~~~~~~~~~~~~ End of Trait call ~~~~~~~~~~~~~~~~~~~//
+                //~~~~~~~~~~~~~~~~ End of Trait calls ~~~~~~~~~~~~~~~~~~~//
             }
 
             //--------- Building DTOs --------//
@@ -68,13 +67,15 @@ class ApiController extends FOSRestController
 
             return $this->handleView($this->view(
                 [
-                    'status' => 'ok',
+                    'success' => 'ok',
                     'data' => $dataDTO,
                     'message' => 'Premium Successfully retrieved'
                 ],
-                Response::HTTP_CREATED));
+                Response::HTTP_CREATED)
+            );
         }
 
+        //------- Return failed process with validation errors --------//
         return $this->handleView($this->view($form->getErrors()));
     }
 }
