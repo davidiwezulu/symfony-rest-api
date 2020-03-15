@@ -22,7 +22,8 @@ trait PremiumTrait
      * @param $em
      * @return mixed
      */
-    public function getBasePremium(EntityManagerInterface $em) {
+    public function getBasePremium(EntityManagerInterface $em)
+    {
         $basePremiumRepository  = $em->getRepository(BasePremium::class);
         $basePremiumObject      = $basePremiumRepository->findFirstPremium();
         $basePremium            = $basePremiumObject->getBasePremium();
@@ -36,7 +37,8 @@ trait PremiumTrait
      * @param $premiumDataArray
      * @return Quotes
      */
-    public function persistNewQuote(EntityManagerInterface $em, $data, $premiumDataArray) {
+    public function persistNewQuote(EntityManagerInterface $em, $data, $premiumDataArray)
+    {
         $averagePremium = array_sum($premiumDataArray)/count($premiumDataArray);
         $quote = new Quote();
         $quote->setPolicyNumber('1111');
@@ -119,7 +121,8 @@ trait PremiumTrait
      * @param $data
      * @return int
      */
-    public  function abiCodeLookUp(array $data) {
+    public function abiCodeLookUp(array $data)
+    {
         //----- Fall back ABI code for API mock up ----------------//
         $abiCode    = 22529902;
 
@@ -141,7 +144,8 @@ trait PremiumTrait
      * @param $data
      * @return mixed
      */
-    public function callVendorsAPI(string $method, string $url, array $data){
+    public function callVendorsAPI(string $method, string $url, array $data)
+    {
         $curl           = curl_init();
         //~~~~~~~~~ Should be stored in a config environment ~~~~~//
         $vendorToken    = "080042cad6356ad5dc0a720c18b53b8e53d4c274";
