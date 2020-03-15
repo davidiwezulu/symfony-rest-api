@@ -151,6 +151,7 @@ trait PremiumTrait
     public function callVendorsAPI(string $method, string $url, array $data)
     {
         $curl           = curl_init();
+        $jsonData       = json_encode($data);
         //~~~~~~~~~ Should be stored in a config environment ~~~~~//
         $vendorToken    = "080042cad6356ad5dc0a720c18b53b8e53d4c274";
         $authorization  = "Authorization: Bearer $vendorToken";
@@ -158,12 +159,12 @@ trait PremiumTrait
             case "POST":
                 curl_setopt($curl, CURLOPT_POST, 1);
                 if ($data)
-                    curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+                    curl_setopt($curl, CURLOPT_POSTFIELDS, $jsonData);
                 break;
             case "PUT":
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
                 if ($data)
-                    curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+                    curl_setopt($curl, CURLOPT_POSTFIELDS, $jsonData);
                 break;
             default:
                 if ($data)
