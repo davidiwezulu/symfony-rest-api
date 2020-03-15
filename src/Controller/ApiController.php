@@ -51,8 +51,8 @@ class ApiController extends FOSRestController
             } else {
                 //~~~~~~~~~~~~~~~~ #\App\Traits\PremiumTrait ~~~~~~~~~~~~//
                 //--------- Trigger API call to fetch ABI Code --------------//
-                $basePremium        = $this->getBasePremium($em);
                 $data['abiCode']    = $this->abiCodeLookUp($data);
+                $basePremium        = $this->getBasePremium($em);
                 $premiumArray       = $this->fetchPremiumData($em, $data, $basePremium );
                 $quoteData          = $this->persistNewQuote($em, $data, $premiumArray);
                 //~~~~~~~~~~~~~~~~ End of Trait calls ~~~~~~~~~~~~~~~~~~~//
