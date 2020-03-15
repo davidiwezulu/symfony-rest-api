@@ -5,6 +5,7 @@ use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use App\Entity\PostcodeRating;
 use App\Entity\AbiCodeRating;
 use App\Traits\PremiumTrait;
 use App\Form\PremiumType;
@@ -57,9 +58,19 @@ class ApiController extends FOSRestController
                 $basePremium
             );
 
+            //------------ Postcode Premium -------------------//
+            $PostcodeRatingRepository = $em->getRepository(PostcodeRating::class);
+            $postcodeRatePremium = $this->calculateRatingFactor(
+                $PostcodeRatingRepository,
+                $data['postcode'],
+                $basePremium
+            );
+
+
 
             //--------- Building DTOs --------//
-            $dataDTO['abiCodeRatePremium'] = $abiCodeRatePremium;
+            $dataDTO['abiCodeRatePremium']  = $abiCodeRatePremium;
+            $dataDTO['postcodeRatePremium'] = $postcodeRatePremium;
 
 
 
