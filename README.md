@@ -1,4 +1,4 @@
-# Symfony REST API skeletion. 
+# Symfony REST API Skeletion. 
 <p>Built in Symfony MVC framework.</p>
 
 ## Installation and Setup
