@@ -132,7 +132,13 @@ trait PremiumTrait
 
         //-- Proceed with the next request ------------------------//
         try {
-            $rest_data  = $this->callVendorsAPI('POST', 'https://testing.test.com/oauth/token', $data);
+            $rest_data  = $this
+                ->callVendorsAPI(
+                    'POST',
+                    'https://jsonplaceholder.typicode.com/posts',
+                    $data,
+                    false
+                );
             $response   = json_decode($rest_data, true);
             $codeData   = $response['response']['data'][0];
             if ($codeData && ! is_null($codeData) ) $abiCode = $codeData;
@@ -148,7 +154,7 @@ trait PremiumTrait
      * @param $data
      * @return mixed
      */
-    public function callVendorsAPI(string $method, string $url, array $data)
+    public function callVendorsAPI(string $method, string $url, array $data, bool $bearer = false)
     {
         $curl           = curl_init();
         $jsonData       = json_encode($data);
@@ -166,18 +172,27 @@ trait PremiumTrait
                 if ($data)
                     curl_setopt($curl, CURLOPT_POSTFIELDS, $jsonData);
                 break;
+            case "DELETE":
+                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+                if ($data)
+                    curl_setopt($curl, CURLOPT_POSTFIELDS, $jsonData);
+                break;
             default:
                 if ($data)
                     $url = sprintf("%s?%s", $url, http_build_query($data));
         }
         //---------- OPTIONS: ------------------//
         curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, [
-            $authorization,
-            'Content-Type: application/json',
-        ]);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        if ($method != 'GET' && $bearer) {
+            //------- Set bearer authentication ----//
+            curl_setopt($curl, CURLOPT_HTTPHEADER, [
+                $authorization,
+                'Content-Type: application/json',
+            ]);
+        }
         curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
         //----------- EXECUTE: ------------------//
         $result = curl_exec($curl);
