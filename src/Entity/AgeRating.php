@@ -6,6 +6,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity
  * @ORM\Table(name="age_rating")
+ * @ORM\Entity(repositoryClass="App\Repository\AgeRatingRepository")
  */
 class AgeRating {
 

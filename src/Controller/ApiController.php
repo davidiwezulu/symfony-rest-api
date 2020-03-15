@@ -7,9 +7,12 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use App\Entity\PostcodeRating;
 use App\Entity\AbiCodeRating;
+use App\Entity\AgeRating;
 use App\Traits\PremiumTrait;
 use App\Form\PremiumType;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\CurlHttpClient;
 /**
  * Movie controller.
  * @Route("/api", name="api_")
@@ -47,30 +50,21 @@ class ApiController extends FOSRestController
         if ($form->isSubmitted() && $form->isValid()) {
 
             //--------- Trigger API call for Abi Code --------------//
-            $AbiCode    = 22529902;
-            $basePremium = 500.00;
+            $basePremium        = 500.00;
 
-            //----------- AbiCode Rate Premium ---------------//
-            $abiCodeRatingRepository = $em->getRepository(AbiCodeRating::class);
-            $abiCodeRatePremium = $this->calculateRatingFactor(
-                $abiCodeRatingRepository,
-                $AbiCode,
-                $basePremium
-            );
-
-            //------------ Postcode Premium -------------------//
-            $PostcodeRatingRepository = $em->getRepository(PostcodeRating::class);
-            $postcodeRatePremium = $this->calculateRatingFactor(
-                $PostcodeRatingRepository,
-                $data['postcode'],
-                $basePremium
-            );
-
-
+            //~~~~~~~~~~~~~~~~ \App\Traits\PremiumTrait ~~~~~~~~~~~~//
+            $data['abiCode']    = $this->abiCodeLookUp(new CurlHttpClient(), $data);
+            list (
+                $abiCodeRatePremium,
+                $postcodeRatePremium,
+                $ageRatePremium
+            )   = $this->fetchPremiumData($em, $data, $basePremium );
+            //~~~~~~~~~~~~~~~~ End of Trait call ~~~~~~~~~~~~~~~~~~~//
 
             //--------- Building DTOs --------//
             $dataDTO['abiCodeRatePremium']  = $abiCodeRatePremium;
             $dataDTO['postcodeRatePremium'] = $postcodeRatePremium;
+            $dataDTO['ageRatePremium']      = $ageRatePremium;
 
 
 
