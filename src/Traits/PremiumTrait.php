@@ -130,16 +130,16 @@ trait PremiumTrait
         //----- Fall back ABI code for API mock up ----------------//
         $abiCode    = 22529902;
 
-        //-- Proceed with the next request ------------------------//
+        //-- Proceed with API request ------------------------//
         try {
-            $rest_data  = $this
-                ->callVendorsAPI(
-                    'POST',
-                    'https://jsonplaceholder.typicode.com/posts',
-                    $data,
-                    false
-                );
+            $rest_data  = $this->callVendorsAPI(
+                'POST',
+                'https://jsonplaceholder.typicode.com/posts',
+                $data,
+                null
+            );
             $response   = json_decode($rest_data, true);
+            //---------- Declaring a fake offset -----------
             $codeData   = $response['response']['data'][0];
             if ($codeData && ! is_null($codeData) ) $abiCode = $codeData;
         } catch (\Exception $exception) {}
@@ -154,13 +154,11 @@ trait PremiumTrait
      * @param $data
      * @return mixed
      */
-    public function callVendorsAPI(string $method, string $url, array $data, bool $bearer = false)
+    public function callVendorsAPI(string $method, string $url, array $data, string $bearer = null)
     {
         $curl           = curl_init();
         $jsonData       = json_encode($data);
-        //~~~~~~~~~ Should be stored in a config environment ~~~~~//
-        $vendorToken    = "080042cad6356ad5dc0a720c18b53b8e53d4c274";
-        $authorization  = "Authorization: Bearer $vendorToken";
+        $authorization  = "Authorization: Bearer $bearer";
         switch ($method){
             case "POST":
                 curl_setopt($curl, CURLOPT_POST, 1);
@@ -184,7 +182,7 @@ trait PremiumTrait
         //---------- OPTIONS: ------------------//
         curl_setopt($curl, CURLOPT_URL, $url);
 
-        if ($method != 'GET' && $bearer) {
+        if ( $bearer && ! is_null($bearer) ) {
             //------- Set bearer authentication ----//
             curl_setopt($curl, CURLOPT_HTTPHEADER, [
                 $authorization,
