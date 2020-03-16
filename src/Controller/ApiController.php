@@ -79,10 +79,3 @@ class ApiController extends FOSRestController
         return $this->handleView($this->view($form->getErrors()));
     }
 }
-
-/**
- * curl --header "Content-Type: application/json" \
---request POST \
---data '{"name":"movie1","description":"movie number 1"}' \
-http://127.0.0.1:8000/api/movie
- */
