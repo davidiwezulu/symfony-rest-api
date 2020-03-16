@@ -132,12 +132,7 @@ trait PremiumTrait
 
         //-- Proceed with API request ------------------------//
         try {
-            $rest_data  = $this->callVendorsAPI(
-                'POST',
-                'https://jsonplaceholder.typicode.com/posts',
-                $data,
-                null
-            );
+            $rest_data  = $this->callVendorsAPI('POST','https://jsonplaceholder.typicode.com/posts',$data,null);
             $response   = json_decode($rest_data, true);
             //---------- Declaring a fake offset -----------
             $codeData   = $response['response']['data'][0];

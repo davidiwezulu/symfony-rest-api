@@ -69,7 +69,7 @@ class ApiController extends FOSRestController
                 [
                     'success' => 'ok',
                     'data' => $dataDTO,
-                    'message' => 'Premium Successfully retrieved'
+                    'message' => 'Premium Successfully Retrieved'
                 ],
                 Response::HTTP_CREATED)
             );
